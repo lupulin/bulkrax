@@ -236,6 +236,13 @@ module Bulkrax
 
     def update_file_set(attrs)
       file_set_attrs = attrs.slice(*object.attributes.keys)
+      
+      # add visibility attributes if present
+      file_set_attrs["visibility"] = attrs["visibility"] if attrs.key?("visibility")
+      file_set_attrs["visibility_during_embargo"] = attrs["visibility_during_embargo"] if attrs.key?("visibility_during_embargo")
+      file_set_attrs["embargo_release_date"] = attrs["embargo_release_date"] if attrs.key?("embargo_release_date")
+      file_set_attrs["visibility_after_embargo"] = attrs["visibility_after_embargo"] if attrs.key?("visibility_after_embargo")
+
       actor = ::Hyrax::Actors::FileSetActor.new(object, @user)
       attrs['remote_files']&.each do |remote_file|
         handle_remote_file(remote_file: remote_file, actor: actor)

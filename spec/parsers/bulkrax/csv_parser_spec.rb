@@ -543,21 +543,21 @@ module Bulkrax
     describe '#path_to_files' do
       context 'when an argument is passed' do
         it 'returns the correct path' do
-          expect(subject.path_to_files(filename: 'sun.jpg')).to eq('spec/fixtures/csv/files/sun.jpg')
+          expect(subject.path_to_files(filename: 'sun.jpg')).to eq('spec/fixtures/csv/sun.jpg')
         end
 
         it 'returns the correct path when multiple files are processed' do
-          expect(subject.path_to_files(filename: 'sun.jpg')).to eq('spec/fixtures/csv/files/sun.jpg')
+          expect(subject.path_to_files(filename: 'sun.jpg')).to eq('spec/fixtures/csv/sun.jpg')
 
           second_path = subject.path_to_files(filename: 'moon.jpg')
-          expect(second_path).to eq('spec/fixtures/csv/files/moon.jpg')
-          expect(second_path).not_to eq('spec/fixtures/csv/files/sun.jpg')
+          expect(second_path).to eq('spec/fixtures/csv/moon.jpg')
+          expect(second_path).not_to eq('spec/fixtures/csv/sun.jpg')
         end
       end
 
       context 'when an argument is not passed' do
         it 'returns the correct path' do
-          expect(subject.path_to_files).to eq('spec/fixtures/csv/files/')
+          expect(subject.path_to_files).to eq('spec/fixtures/csv/')
         end
       end
     end

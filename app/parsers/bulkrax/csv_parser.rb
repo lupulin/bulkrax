@@ -214,6 +214,37 @@ module Bulkrax
       return nil
     end
 
+    def move_csv_file_to_kdrive(files, uploads, importer)
+      # /mnt/hyrax/imports/10_20230929154530/bulkrax_local.csv 
+      # to
+      # /mnt/kdrive/sample_files/bulkrax_local.csv
+      unless uploads.nil?
+        current_import_path = importer.parser.write_import_file(uploads.first.file.file)
+      else
+        return importer.parser_fields['import_file_path'] if importer.parser_fields['import_file_path'].present?
+        raise "No import file path could be determined from uploads or parser fields."
+      end
+
+      # move uploaded file to the same directory as the other cloud files
+      if files.present? && !files.first.nil?
+        file_name = current_import_path.split('/').last
+        cloud_files = files.first.second["url"]
+        cloud_files_path = cloud_files.split('/')[2...-1].join('/')
+        new_import_file_path = File.join(cloud_files_path, file_name)
+
+        FileUtils.mv(
+            current_import_path,
+            new_import_file_path,
+            force: true,
+            verbose: true
+          )
+        new_import_file_path
+      else
+        current_import_path
+      end
+    end
+
+
     # export methods
 
     def write_files
@@ -364,15 +395,13 @@ module Bulkrax
     # Retrieve the path where we expect to find the files
     def path_to_files(**args)
       filename = args.fetch(:filename, '')
-
+      
       return @path_to_files if @path_to_files.present? && filename.blank?
       @path_to_files = File.join(
-          zip? ? importer_unzip_path : File.dirname(import_file_path), 'files', filename
+          zip? ? importer_unzip_path : File.dirname(import_file_path), filename
         )
 
-      return @path_to_files if File.exist?(@path_to_files)
-
-      File.join(importer_unzip_path, 'files', filename) if file? && zip?
+      return @path_to_files
     end
 
     private

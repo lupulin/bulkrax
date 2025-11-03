@@ -230,20 +230,13 @@ module Bulkrax
       return if file.blank? && cloud_files.blank? && uploads.blank?
 
       @importer[:parser_fields]['import_file_path'] = @importer.parser.write_import_file(file) if file.present?
-      if cloud_files.present?
-        @importer[:parser_fields]['cloud_file_paths'] = cloud_files
-        # For BagIt, there will only be one bag, so we get the file_path back and set import_file_path
-        # For CSV, we expect only file uploads, so we won't get the file_path back
-        # and we expect the import_file_path to be set already
-        target = @importer.parser.retrieve_cloud_files(cloud_files, @importer)
-        @importer[:parser_fields]['import_file_path'] = target if target.present?
-      end
-
-      if uploads.present?
-        uploads.each do |upload|
-          @importer[:parser_fields]['import_file_path'] = @importer.parser.write_import_file(upload.file.file)
-        end
-      end
+      @importer[:parser_fields]['cloud_file_paths'] = cloud_files
+      # For BagIt, there will only be one bag, so we get the file_path back and set import_file_path
+      # For CSV, we expect only file uploads, so we won't get the file_path back
+      # and we expect the import_file_path to be set already
+      # target = @importer.parser.retrieve_cloud_files(cloud_files, @importer)
+      target = @importer.parser.move_csv_file_to_kdrive(cloud_files, uploads, @importer)
+      @importer[:parser_fields]['import_file_path'] = target if target.present?
 
       @importer.save
     end

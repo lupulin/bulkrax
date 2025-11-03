@@ -102,6 +102,11 @@ module Bulkrax
         elsif params[:commit] == 'Create and Validate'
           Bulkrax::ImporterJob.send(@importer.parser.perform_method, @importer.id)
           render_request('Importer validation completed. Please review and choose to either Continue with or Discard the import.', true)
+        elsif params[:commit] == 'Update Metadata'
+          @importer.parser_fields['metadata_only'] = true
+          @importer.save
+          Bulkrax::ImporterJob.send(@importer.parser.perform_method, @importer.id)
+          render_request('Importer was successfully created and metadata update has been queued.')
         else
           render_request('Importer was successfully created.')
         end
